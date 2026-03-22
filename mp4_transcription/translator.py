@@ -1,66 +1,72 @@
-import json
-import anthropic
+import deepl
 from .transcriber import Segment
 
+# DeepL の言語コードマッピング（入力コード → DeepL ターゲットコード）
+LANGUAGE_MAP = {
+    "en": "EN-US",
+    "en-gb": "EN-GB",
+    "zh": "ZH-HANS",
+    "zh-TW": "ZH-HANT",
+    "ko": "KO",
+    "fr": "FR",
+    "de": "DE",
+    "es": "ES",
+    "pt": "PT-BR",
+    "pt-pt": "PT-PT",
+    "it": "IT",
+    "ru": "RU",
+    "ar": "AR",
+    "id": "ID",
+    "nl": "NL",
+    "pl": "PL",
+    "sv": "SV",
+    "tr": "TR",
+}
+
 LANGUAGE_NAMES = {
-    "en": "English",
-    "zh": "Chinese (Simplified)",
-    "zh-TW": "Chinese (Traditional)",
-    "ko": "Korean",
-    "fr": "French",
-    "de": "German",
-    "es": "Spanish",
-    "pt": "Portuguese",
-    "it": "Italian",
-    "ru": "Russian",
-    "ar": "Arabic",
-    "th": "Thai",
-    "vi": "Vietnamese",
-    "id": "Indonesian",
+    "en": "English（英語）",
+    "zh": "Chinese Simplified（中国語簡体字）",
+    "zh-TW": "Chinese Traditional（中国語繁体字）",
+    "ko": "Korean（韓国語）",
+    "fr": "French（フランス語）",
+    "de": "German（ドイツ語）",
+    "es": "Spanish（スペイン語）",
+    "pt": "Portuguese BR（ポルトガル語）",
+    "it": "Italian（イタリア語）",
+    "ru": "Russian（ロシア語）",
+    "ar": "Arabic（アラビア語）",
+    "id": "Indonesian（インドネシア語）",
+    "nl": "Dutch（オランダ語）",
+    "pl": "Polish（ポーランド語）",
+    "sv": "Swedish（スウェーデン語）",
+    "tr": "Turkish（トルコ語）",
 }
 
 
 def translate_segments(segments: list[Segment], target_lang: str) -> list[Segment]:
     """
     セグメントリストを指定言語に翻訳して返す。
-    Claude API (claude-opus-4-6) を使用。
+    DeepL API（無料版・有料版どちらも対応）を使用。
+    DEEPL_AUTH_KEY 環境変数が必要。
     """
     lang_name = LANGUAGE_NAMES.get(target_lang, target_lang)
+    deepl_lang = LANGUAGE_MAP.get(target_lang.lower(), target_lang.upper())
+
     print(f"翻訳中: 日本語 → {lang_name} ({target_lang})")
 
-    # 全セグメントのテキストをまとめてJSONで渡す
-    source_texts = [{"id": i, "text": seg.text} for i, seg in enumerate(segments)]
+    translator = deepl.Translator()  # DEEPL_AUTH_KEY 環境変数を自動で読む
 
-    client = anthropic.Anthropic()
+    # セグメントのテキストをまとめてリスト送信（APIコール回数を最小化）
+    source_texts = [seg.text for seg in segments]
+    results = translator.translate_text(
+        source_texts,
+        source_lang="JA",
+        target_lang=deepl_lang,
+    )
 
-    prompt = f"""以下のJSON配列は日本語の字幕テキストです。
-各要素の "text" フィールドを{lang_name}に翻訳してください。
-"id" フィールドは変更せず、翻訳後のテキストを "text" フィールドに入れてください。
-JSON配列のみを返し、説明文は不要です。
+    translated = []
+    for seg, result in zip(segments, results):
+        translated.append(Segment(start=seg.start, end=seg.end, text=result.text))
 
-{json.dumps(source_texts, ensure_ascii=False, indent=2)}"""
-
-    with client.messages.stream(
-        model="claude-opus-4-6",
-        max_tokens=16000,
-        messages=[{"role": "user", "content": prompt}],
-    ) as stream:
-        response_text = stream.get_final_message().content[0].text
-
-    # JSONを抽出してパース
-    # コードブロック記法（```json ... ```）が含まれている場合も考慮
-    response_text = response_text.strip()
-    if response_text.startswith("```"):
-        lines = response_text.splitlines()
-        response_text = "\n".join(lines[1:-1])
-
-    translated_list: list[dict] = json.loads(response_text)
-    translated_map = {item["id"]: item["text"] for item in translated_list}
-
-    result = []
-    for i, seg in enumerate(segments):
-        translated_text = translated_map.get(i, seg.text)
-        result.append(Segment(start=seg.start, end=seg.end, text=translated_text))
-
-    print(f"翻訳完了: {len(result)} セグメント")
-    return result
+    print(f"翻訳完了: {len(translated)} セグメント")
+    return translated

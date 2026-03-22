@@ -28,12 +28,14 @@ def main() -> None:
   it    Italian（イタリア語）
   ru    Russian（ロシア語）
   ar    Arabic（アラビア語）
-  th    Thai（タイ語）
-  vi    Vietnamese（ベトナム語）
   id    Indonesian（インドネシア語）
+  nl    Dutch（オランダ語）
+  pl    Polish（ポーランド語）
+  sv    Swedish（スウェーデン語）
+  tr    Turkish（トルコ語）
 
-事前に ANTHROPIC_API_KEY 環境変数を設定してください:
-  export ANTHROPIC_API_KEY="your-api-key"
+事前に DEEPL_AUTH_KEY 環境変数を設定してください:
+  export DEEPL_AUTH_KEY="your-deepl-api-key"
         """,
     )
     parser.add_argument("input", type=Path, help="入力VTTファイルのパス")
