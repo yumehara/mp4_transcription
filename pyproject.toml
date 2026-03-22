@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "mp4-transcription"
+version = "0.1.0"
+description = "MP4ファイルを文字起こししてVTT字幕ファイルを生成するツール"
+authors = ["umehara_yasunobu"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.10"
+faster-whisper = "^1.2.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
