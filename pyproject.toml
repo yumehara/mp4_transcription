@@ -10,6 +10,7 @@ python = ">=3.10,<4"
 faster-whisper = "^1.2.1"
 anthropic = "^0.86.0"
 deepl = "^1.28.0"
+python-dotenv = "^1.2.2"
 
 
 [build-system]

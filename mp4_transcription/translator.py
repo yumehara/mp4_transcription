@@ -1,4 +1,8 @@
 import deepl
+from dotenv import load_dotenv
+
+load_dotenv()
+
 from .transcriber import Segment
 
 # DeepL の言語コードマッピング（入力コード → DeepL ターゲットコード）
