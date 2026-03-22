@@ -80,3 +80,59 @@ WEBVTT
 ```
 
 VTTファイルはほとんどの動画プレイヤーや動画編集ソフトで利用できます。
+
+---
+
+## 字幕の翻訳
+
+日本語のVTTファイルを任意の言語に翻訳できます。翻訳には [Claude API](https://www.anthropic.com/) を使用します。
+
+### 事前準備
+
+Anthropic の API キーを環境変数に設定してください。
+
+```bash
+export ANTHROPIC_API_KEY="your-api-key"
+```
+
+### 使い方
+
+```bash
+poetry run python -m mp4_transcription.translate <input.vtt> --lang <言語コード> [オプション]
+```
+
+```bash
+# 英語に翻訳（input.en.vtt として保存）
+poetry run python -m mp4_transcription.translate subtitles.vtt --lang en
+
+# 韓国語に翻訳して出力先を指定
+poetry run python -m mp4_transcription.translate subtitles.vtt --lang ko --output korean.vtt
+```
+
+### オプション
+
+| オプション | 短縮形 | デフォルト | 説明 |
+|-----------|--------|-----------|------|
+| `--lang` | `-l` | （必須） | 翻訳先の言語コード |
+| `--output` | `-o` | `入力名.言語コード.vtt` | 出力VTTファイルのパス |
+
+### 対応言語
+
+| 言語コード | 言語 |
+|-----------|------|
+| `en` | English（英語） |
+| `zh` | Chinese Simplified（中国語簡体字） |
+| `zh-TW` | Chinese Traditional（中国語繁体字） |
+| `ko` | Korean（韓国語） |
+| `fr` | French（フランス語） |
+| `de` | German（ドイツ語） |
+| `es` | Spanish（スペイン語） |
+| `pt` | Portuguese（ポルトガル語） |
+| `it` | Italian（イタリア語） |
+| `ru` | Russian（ロシア語） |
+| `ar` | Arabic（アラビア語） |
+| `th` | Thai（タイ語） |
+| `vi` | Vietnamese（ベトナム語） |
+| `id` | Indonesian（インドネシア語） |
+
+上記以外の言語も、言語コードを指定することで翻訳できます（Claude が対応している言語であれば動作します）。
