@@ -4,6 +4,7 @@ from pathlib import Path
 
 from .transcriber import WhisperTranscriber
 from .vtt_writer import write_vtt
+from .segment_processor import process_segments
 
 VALID_MODELS = ["tiny", "base", "small", "medium", "large-v2", "large-v3"]
 
@@ -49,6 +50,7 @@ def main() -> None:
 
     transcriber = WhisperTranscriber(model_size=args.model)
     segments = transcriber.transcribe(str(input_path))
+    segments = process_segments(segments)
 
     if not segments:
         print("警告: 文字起こし結果が空です。", file=sys.stderr)
