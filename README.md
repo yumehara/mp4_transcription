@@ -45,6 +45,23 @@ poetry run python -m mp4_transcription.main video.mp4 --output subtitles.vtt
 |-----------|--------|-----------|------|
 | `--output` | `-o` | 入力と同じ場所・同名 | 出力VTTファイルのパス |
 | `--model` | `-m` | `large-v3` | Whisperモデルのサイズ |
+| `--start` | `-s` | 先頭から | 文字起こしを開始する時刻 |
+| `--end` | `-e` | 末尾まで | 文字起こしを終了する時刻 |
+
+### 時間範囲を指定して文字起こし
+
+`--start` / `--end` で指定した区間だけを文字起こしできます。時刻は「秒数」「MM:SS」「HH:MM:SS」のいずれかの形式で指定でき、出力されるVTTのタイムスタンプは元動画の時間軸のまま保持されます。
+
+```bash
+# 1分30秒から5分までを文字起こし
+poetry run python -m mp4_transcription.main video.mp4 --start 01:30 --end 05:00
+
+# 秒数で指定（90秒〜300秒）
+poetry run python -m mp4_transcription.main video.mp4 --start 90 --end 300
+
+# 開始時刻のみ指定（そこから末尾まで）
+poetry run python -m mp4_transcription.main video.mp4 --start 10:00
+```
 
 ### モデルサイズの選択
 
