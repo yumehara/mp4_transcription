@@ -5,3 +5,15 @@ __pycache__/
 dist/
 *.egg-info/
 .env
+
+# 動画・音声ファイル（文字起こし対象の入力ファイルを誤ってコミットしないように）
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.wav
+*.mp3
+*.m4a
+
+# macOS
+.DS_Store
